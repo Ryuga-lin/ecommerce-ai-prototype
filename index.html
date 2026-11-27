@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>电商素材工作台 · 交互原型</title>
+<style>
+/* ========== 基础 ========== */
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:#f6f7f9;color:#1f2329;font-size:13px;line-height:1.5;
+}
+button,input,textarea,select{font:inherit;color:inherit;}
+button{cursor:pointer;}
+[hidden]{display:none!important;}
+
+/* ========== 顶栏 ========== */
+.topbar{
+  height:64px;background:#fff;border-bottom:1px solid #e6e8eb;
+  display:flex;align-items:center;gap:24px;padding:0 24px;
+}
+.brand{display:flex;align-items:center;gap:10px;min-width:260px;}
+.brand-mark{width:32px;height:32px;border-radius:8px;background:#4f46e5;color:#fff;display:grid;place-items:center;font-weight:600;font-size:15px;}
+.brand-text{display:flex;flex-direction:column;line-height:1.25;}
+.brand-text strong{font-size:15px;font-weight:600;}
+.brand-text span{font-size:11px;color:#8f959e;}
+.tabs{display:flex;gap:4px;height:100%;align-items:center;}
+.tab{position:relative;height:100%;padding:0 14px;border:0;background:transparent;color:#646a73;font-size:13px;display:flex;align-items:center;gap:6px;}
+.tab:hover{color:#1f2329;}
+.tab.is-active{color:#4f46e5;font-weight:500;}
+.tab.is-active::after{content:"";position:absolute;left:14px;right:14px;bottom:0;height:2px;background:#4f46e5;border-radius:2px 2px 0 0;}
+.tab-badge{font-size:10px;color:#8f959e;background:#f1f2f4;border-radius:4px;padding:1px 5px;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:7px;color:#8f959e;font-size:12px;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#f59e0b;}
+
+/* ========== 布局 ========== */
+.layout{
+  max-width:1440px;margin:0 auto;padding:20px 24px;
+  height:calc(100vh - 64px);
+  display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;
+}
+.panel{background:#fff;border:1px solid #e6e8eb;border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.panel-head{padding:16px 18px;border-bottom:1px solid #eef0f2;display:flex;align-items:baseline;gap:10px;}
+.panel-head h2{margin:0;font-size:14px;font-weight:600;}
+.panel-sub{font-size:11px;color:#8f959e;}
+.panel-body{padding:18px;overflow:auto;flex:1;}
+.panel-foot{padding:14px 18px;border-top:1px solid #eef0f2;display:flex;gap:10px;align-items:center;}
+
+/* ========== 表单 ========== */
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;color:#4e535b;margin-bottom:6px;}
+.field .req{color:#e5484d;}
+.hint{font-size:11px;color:#a0a5ad;font-weight:400;}
+input[type=text],select,textarea{
+  width:100%;border:1px solid #dfe2e6;border-radius:8px;background:#fff;
+  padding:8px 10px;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;
+}
+input[type=text]:focus,select:focus,textarea:focus{border-color:#4f46e5;box-shadow:0 0 0 3px #eef2ff;}
+textarea{resize:vertical;line-height:1.5;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.upload{
+  border:1px dashed #cfd3da;border-radius:8px;padding:16px;text-align:center;
+  background:#fafbfc;cursor:pointer;transition:.15s;
+}
+.upload:hover{border-color:#4f46e5;background:#f7f7ff;}
+.upload.has-file{border-style:solid;border-color:#b7bed1;}
+.upload-icon{font-size:20px;color:#a0a5ad;line-height:1;}
+.upload-text{font-size:12px;color:#4e535b;margin-top:6px;}
+.upload-sub{font-size:11px;color:#a0a5ad;margin-top:3px;}
+.upload-mini{border:1px dashed #cfd3da;border-radius:8px;padding:8px 10px;font-size:12px;color:#8f959e;cursor:pointer;text-align:center;}
+.upload-mini:hover{border-color:#4f46e5;color:#4f46e5;}
+.check{display:flex;align-items:center;gap:7px;font-size:12px;color:#4e535b;margin:4px 0 14px;cursor:pointer;}
+.check input{accent-color:#4f46e5;}
+
+/* ========== 按钮 ========== */
+.btn{border:1px solid transparent;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:500;transition:.15s;white-space:nowrap;}
+.btn-primary{background:#4f46e5;color:#fff;flex:1;}
+.btn-primary:hover{background:#4338ca;}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed;}
+.btn-ghost{background:#fff;border-color:#dfe2e6;color:#4e535b;}
+.btn-ghost:hover{border-color:#b7bed1;background:#fafbfc;}
+.link-btn{border:0;background:transparent;color:#8f959e;font-size:12px;padding:0;}
+.link-btn:hover{color:#4f46e5;}
+
+/* ========== 结果区 ========== */
+.result-head{padding:14px 18px;border-bottom:1px solid #eef0f2;display:flex;align-items:center;justify-content:space-between;}
+.result-head h2{margin:0;font-size:14px;font-weight:600;}
+.result-head-right{display:flex;align-items:center;gap:12px;}
+.muted{font-size:12px;color:#8f959e;}
+.result-body{padding:18px;overflow:auto;flex:1;position:relative;}
+.empty,.loading{height:100%;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.empty-icon{width:52px;height:52px;border-radius:14px;background:#f1f2f4;display:grid;place-items:center;font-size:22px;color:#b4b9c1;margin-bottom:14px;}
+.empty p{margin:0 0 6px;font-size:13px;color:#646a73;}
+.empty span{font-size:11px;color:#a0a5ad;}
+.loading{gap:14px;color:#646a73;}
+.spinner{width:26px;height:26px;border:2.5px solid #e6e8eb;border-top-color:#4f46e5;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error-box{max-width:420px;width:100%;margin:60px auto;border:1px solid #f7c1c1;background:#fef6f6;border-radius:10px;padding:20px;text-align:left;}
+.error-title{margin:0 0 8px;font-size:14px;font-weight:600;color:#a32d2d;}
+.error-msg{margin:0 0 6px;font-size:13px;color:#791f1f;word-break:break-word;}
+.error-hint{margin:0 0 14px;font-size:11px;color:#993c1d;}
+.status-error{background:#e24b4a;}
+.status-ok{background:#1d9e75;}
+
+/* ========== 结果卡片 ========== */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;}
+.card{border:1px solid #e6e8eb;border-radius:10px;overflow:hidden;background:#fff;}
+.card-media{height:190px;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;background:linear-gradient(135deg,var(--tone-a),var(--tone-b));}
+.media-tag{position:absolute;top:12px;left:12px;font-size:10px;background:rgba(255,255,255,.8);color:#4e535b;border-radius:4px;padding:2px 6px;}
+.media-title{font-size:18px;font-weight:600;color:#262a31;line-height:1.3;}
+.media-sell{font-size:12px;color:#4e535b;margin-top:6px;}
+.card-content{padding:14px;}
+.row-label{font-size:11px;color:#8f959e;margin:0 0 5px;}
+.card-content input,.card-content textarea{border-color:#eceff2;background:#fafbfc;}
+.card-content textarea{margin-bottom:12px;}
+.card-actions{display:flex;align-items:center;gap:8px;}
+.mini-btn{border:1px solid #e2e5e9;background:#fff;border-radius:6px;padding:5px 9px;font-size:11px;color:#4e535b;}
+.mini-btn:hover{border-color:#4f46e5;color:#4f46e5;}
+.mini-btn.is-muted{color:#a0a5ad;}
+.spacer{flex:1;}
+.footnote{font-size:11px;color:#a0a5ad;text-align:center;padding:0 24px 16px;}
+
+/* ========== 后续模块占位 ========== */
+.placeholder-view{min-height:calc(100vh - 64px);display:grid;place-items:center;padding:24px;}
+.ph-card{background:#fff;border:1px solid #e6e8eb;border-radius:12px;padding:48px 56px;text-align:center;max-width:440px;}
+.ph-icon{width:56px;height:56px;border-radius:16px;background:#f1f2f4;color:#b4b9c1;display:grid;place-items:center;font-size:24px;margin:0 auto 16px;}
+.ph-card h2{margin:0 0 8px;font-size:16px;font-weight:600;}
+.ph-card p{margin:0 0 18px;font-size:13px;color:#8f959e;line-height:1.7;}
+.ph-tag{display:inline-block;font-size:11px;color:#4f46e5;background:#eef2ff;border-radius:5px;padding:3px 9px;}
+
+/* ========== 反馈 ========== */
+.toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,12px);background:#1f2329;color:#fff;border-radius:8px;padding:9px 16px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:99;}
+.toast.is-show{opacity:1;transform:translate(-50%,0);}
+
+@media(max-width:920px){
+  .topbar{gap:12px;padding:0 14px;}
+  .brand{min-width:auto;}
+  .brand-text span,.topbar-right{display:none;}
+  .layout{grid-template-columns:1fr;height:auto;padding:14px;}
+  .panel-body,.result-body{overflow:visible;}
+  .panel{min-height:auto;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">E</div>
+    <div class="brand-text">
+      <strong>电商素材工作台</strong>
+      <span>商品图文草稿原型</span>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab is-active" data-tab="workspace">生成工作台</button>
+    <button class="tab" data-tab="templates">模板库 <span class="tab-badge">待接入</span></button>
+    <button class="tab" data-tab="assets">素材库 <span class="tab-badge">待接入</span></button>
+  </nav>
+  <div class="topbar-right">
+    <span class="status-dot" id="status-dot"></span>
+    <span id="status-text">连接中…</span>
+  </div>
+</header>
+
+<!-- ==================== 主视图：生成工作台 ==================== -->
+<main class="layout" id="view-workspace">
+  <!-- 左栏：输入区 -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>商品信息</h2>
+      <span class="panel-sub">填写后生成首版图文草稿</span>
+    </div>
+    <div class="panel-body">
+      <div class="field">
+        <label for="f-name">商品名称 <span class="req">*</span></label>
+        <input id="f-name" type="text" placeholder="例如：轻量通勤双肩包" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-category">商品类目</label>
+          <select id="f-category">
+            <option>箱包</option><option>服饰</option><option>家居</option><option>数码</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-brand">品牌</label>
+          <input id="f-brand" type="text" placeholder="选填" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-material">材质</label>
+          <input id="f-material" type="text" placeholder="例如：尼龙" />
+        </div>
+        <div class="field">
+          <label for="f-audience">适用人群</label>
+          <input id="f-audience" type="text" placeholder="例如：通勤白领" />
+        </div>
+      </div>
+      <div class="field">
+        <label>商品图片 <span class="hint">白底图 / 简单场景图</span></label>
+        <div class="upload" id="upload-main">
+          <div class="upload-icon">+</div>
+          <div class="upload-text" id="upload-name">点击或拖拽上传图片</div>
+          <div class="upload-sub">原型阶段仅显示占位，不处理真实图片</div>
+        </div>
+        <input type="file" id="file-input" accept="image/*" hidden />
+      </div>
+      <div class="field">
+        <label>参考图 / 历史爆款 <span class="hint">选填</span></label>
+        <div class="upload-mini" id="upload-ref">+ 添加参考图</div>
+      </div>
+      <label class="check"><input type="checkbox" id="f-save-asset" /> 保存商品素材到素材库 <span class="hint">（后续接入）</span></label>
+      <button class="btn btn-ghost" id="btn-import" style="width:100%">批量导入 Excel <span class="hint">（预留）</span></button>
+    </div>
+    <div class="panel-foot">
+      <button class="btn btn-ghost" id="btn-sample">载入示例</button>
+      <button class="btn btn-primary" id="btn-generate">生成草稿</button>
+    </div>
+  </section>
+
+  <!-- 右栏：结果区 -->
+  <section class="panel">
+    <div class="result-head">
+      <h2>生成结果</h2>
+      <div class="result-head-right">
+        <span class="muted" id="result-count">尚无结果</span>
+        <button class="link-btn" id="btn-clear">清空</button>
+      </div>
+    </div>
+    <div class="result-body">
+      <div class="empty" id="empty-state">
+        <div class="empty-icon">▤</div>
+        <p>填写左侧商品信息，点击「生成草稿」</p>
+        <span>文案由 DeepSeek 实时生成，标题与卖点可直接编辑</span>
+      </div>
+      <div class="loading" id="loading-state" hidden>
+        <div class="spinner"></div>
+        <p id="loading-text">正在调用 DeepSeek 生成草稿…</p>
+      </div>
+      <div class="error-box" id="error-state" hidden>
+        <p class="error-title">生成失败</p>
+        <p class="error-msg" id="error-msg"></p>
+        <p class="error-hint" id="error-hint"></p>
+        <button class="btn btn-ghost" id="btn-retry">重试</button>
+      </div>
+      <div class="cards" id="cards" hidden></div>
+    </div>
+  </section>
+</main>
+<p class="footnote" id="footnote">文案由 DeepSeek 实时生成 · 规划中：模板库 · 素材库 · Excel 批量导入 · 图片/语音/视频能力</p>
+
+<!-- ==================== 后续模块占位视图 ==================== -->
+<main class="placeholder-view" id="view-templates" hidden>
+  <div class="ph-card">
+    <div class="ph-icon">▦</div>
+    <h2>模板库</h2>
+    <p>收藏好用的「主图 + 标题 + 卖点」组合，下次上新时可一键套用到新商品。</p>
+    <span class="ph-tag">后续接入</span>
+  </div>
+</main>
+<main class="placeholder-view" id="view-assets" hidden>
+  <div class="ph-card">
+    <div class="ph-icon">▧</div>
+    <h2>素材库</h2>
+    <p>统一管理商品图片与参考素材，支持按店铺、标签检索与复用。</p>
+    <span class="ph-tag">后续接入</span>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================== 示例数据 ==================== */
+const SAMPLE_FIRST = {
+  name: '轻量通勤双肩包', category: '箱包', brand: 'CityGo',
+  material: '尼龙', audience: '通勤白领', a: '#eef2ff', b: '#dbe4ff'
+};
+const SAMPLE_SECOND = {
+  name: '复古陶瓷马克杯', category: '家居',
+  title: '复古陶瓷马克杯 400ml 手作质感 家用办公咖啡杯',
+  copy: '温润釉面，握感舒适；400ml 容量，一杯刚刚好。',
+  a: '#fff7ed', b: '#ffedd5'
+};
+
+/* ==================== 通用：轻提示 ==================== */
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('is-show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('is-show'), 2200);
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ==================== 核心流程：载入示例 / 生成 / 编辑 / 收藏 ==================== */
+function loadSample() {
+  document.getElementById('f-name').value = SAMPLE_FIRST.name;
+  document.getElementById('f-category').value = SAMPLE_FIRST.category;
+  document.getElementById('f-brand').value = SAMPLE_FIRST.brand;
+  document.getElementById('f-material').value = SAMPLE_FIRST.material;
+  document.getElementById('f-audience').value = SAMPLE_FIRST.audience;
+  const up = document.getElementById('upload-main');
+  document.getElementById('upload-name').textContent = '已选择：sample-product.png（占位）';
+  up.classList.add('has-file');
+  toast('已载入示例数据');
+}
+
+/* 收集表单字段，作为发给后端的业务输入 */
+function readForm() {
+  return {
+    name: document.getElementById('f-name').value.trim(),
+    category: document.getElementById('f-category').value,
+    brand: document.getElementById('f-brand').value.trim(),
+    material: document.getElementById('f-material').value.trim(),
+    audience: document.getElementById('f-audience').value.trim(),
+  };
+}
+
+/* 调用自己的后端接口，Key 始终留在服务端 */
+async function requestGeneration() {
+  const payload = readForm();
+  const res = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(data.error || `请求失败（${res.status}）`);
+    err.hint = data.hint || (data.request_id ? 'Request ID: ' + data.request_id : '');
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+/* 隐藏所有结果态 */
+function resetResults() {
+  document.getElementById('empty-state').hidden = true;
+  document.getElementById('cards').hidden = true;
+  document.getElementById('error-state').hidden = true;
+}
+
+function showError(err) {
+  document.getElementById('loading-state').hidden = true;
+  document.getElementById('btn-generate').disabled = false;
+  document.getElementById('error-state').hidden = false;
+  document.getElementById('error-msg').textContent = err.message;
+  document.getElementById('error-hint').textContent = err.hint || '请检查服务端配置或稍后重试，也可先点「载入示例」验证页面流程。';
+}
+
+async function generate() {
+  const form = readForm();
+  if (!form.name) {
+    toast('请先填写商品名称，或点击「载入示例」');
+    document.getElementById('f-name').focus();
+    return;
+  }
+  resetResults();
+  document.getElementById('loading-state').hidden = false;
+  document.getElementById('loading-text').textContent = '正在调用 DeepSeek 生成草稿…';
+  document.getElementById('btn-generate').disabled = true;
+
+  try {
+    const result = await requestGeneration();
+    document.getElementById('loading-state').hidden = true;
+    document.getElementById('btn-generate').disabled = false;
+    renderCards([{
+      name: form.name,
+      title: result.title,
+      copy: result.summary,
+      points: result.selling_points,
+      a: SAMPLE_FIRST.a, b: SAMPLE_FIRST.b,
+      model: result.model, request_id: result.request_id,
+    }]);
+    document.getElementById('cards').hidden = false;
+    document.getElementById('result-count').textContent = '已生成 1 条草稿';
+    toast('草稿已生成，标题与文案可直接编辑');
+  } catch (err) {
+    showError(err);
+  }
+}
+
+function renderCards(products) {
+  const wrap = document.getElementById('cards');
+  wrap.innerHTML = products.map(p => {
+    const points = Array.isArray(p.points) ? p.points.filter(Boolean) : [];
+    const pointsText = points.length ? points.map(x => '· ' + x).join('\n') : '';
+    const copyTextValue = [p.copy, pointsText].filter(Boolean).join('\n\n');
+    return `
+    <article class="card">
+      <div class="card-media" style="--tone-a:${p.a};--tone-b:${p.b}">
+        <span class="media-tag">主图草稿 · 文字预览</span>
+        <div class="media-title">${escapeHtml(p.name)}</div>
+        <div class="media-sell">${escapeHtml(points[0] || p.copy || '')}</div>
+      </div>
+      <div class="card-content">
+        <p class="row-label">商品标题</p>
+        <input class="title-input" type="text" value="${escapeHtml(p.title)}" />
+        <p class="row-label">简介与卖点（可编辑）</p>
+        <textarea class="copy-input" rows="4" data-copy="${escapeHtml(copyTextValue)}">${escapeHtml(copyTextValue)}</textarea>
+        ${p.model ? `<p class="row-label" style="margin-top:10px">来源：${escapeHtml(p.model)}${p.request_id ? ' · ' + escapeHtml(p.request_id) : ''}</p>` : ''}
+        <div class="card-actions">
+          <button class="mini-btn" data-act="fav">收藏为模板</button>
+          <button class="mini-btn" data-act="copy">复制文案</button>
+          <span class="spacer"></span>
+          <button class="mini-btn is-muted" data-act="more">更多</button>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('文案已复制');
+  } catch (e) {
+    toast('复制失败，请手动选择文本');
+  }
+}
+
+/* ==================== 占位交互：后续模块的入口反馈 ==================== */
+document.getElementById('btn-import').addEventListener('click', () => toast('Excel 批量导入将在后续接入'));
+document.getElementById('upload-ref').addEventListener('click', () => toast('参考图上传将在后续接入'));
+document.getElementById('f-save-asset').addEventListener('change', e => {
+  if (e.target.checked) toast('保存到素材库将在后续接入');
+});
+document.getElementById('btn-sample').addEventListener('click', loadSample);
+document.getElementById('btn-generate').addEventListener('click', generate);
+document.getElementById('btn-retry').addEventListener('click', generate);
+document.getElementById('btn-clear').addEventListener('click', () => {
+  document.getElementById('cards').innerHTML = '';
+  document.getElementById('cards').hidden = true;
+  document.getElementById('error-state').hidden = true;
+  document.getElementById('empty-state').hidden = false;
+  document.getElementById('result-count').textContent = '尚无结果';
+});
+
+/* 启动时探测后端是否就绪，更新右上角状态标记 */
+(async function checkBackend() {
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  try {
+    const res = await fetch('/index.html', { method: 'HEAD' });
+    if (res.ok) {
+      dot.classList.add('status-ok');
+      text.textContent = '已连接 · DeepSeek';
+    } else {
+      dot.classList.add('status-error');
+      text.textContent = '服务异常';
+    }
+  } catch (e) {
+    dot.classList.add('status-error');
+    text.textContent = '未连接服务端（请用 node server.js 启动）';
+  }
+})();
+
+document.getElementById('cards').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const card = btn.closest('.card');
+  const title = card.querySelector('.title-input').value;
+  const copy = card.querySelector('.copy-input').value;
+  if (btn.dataset.act === 'fav') toast('已收藏为模板（模板库将在后续接入）');
+  if (btn.dataset.act === 'copy') copyText(title + '\n' + copy);
+  if (btn.dataset.act === 'more') toast('更多操作将在后续接入');
+});
+
+const fileInput = document.getElementById('file-input');
+document.getElementById('upload-main').addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+  const f = fileInput.files[0];
+  if (!f) return;
+  document.getElementById('upload-name').textContent = '已选择：' + f.name + '（占位，不处理图片）';
+  document.getElementById('upload-main').classList.add('has-file');
+});
+
+/* ==================== 视图切换 ==================== */
+document.getElementById('tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('is-active', t === tab));
+  ['workspace', 'templates', 'assets'].forEach(name => {
+    document.getElementById('view-' + name).hidden = tab.dataset.tab !== name;
+    document.getElementById('footnote').hidden = tab.dataset.tab !== 'workspace';
+  });
+});
+</script>
+</body>
+</html>
